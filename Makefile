@@ -1,7 +1,7 @@
 CC := g++
 CFLAGS := -g -Wall
 
-TARGET := tp1
+TARGET := ./tp1
 SRCDIR := src
 OBJDIR := obj
 
