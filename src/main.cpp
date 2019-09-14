@@ -26,9 +26,8 @@ int main(int argc, char* argv[]) {
 
     for (int i = 0; i < num_alunos; i++) {
         int idade;
-        // Por enquanto, estamos ignorando a idade lida
-        // @TODO: Armazenar as idades dos alunos.
         sstream_linha >> idade;
+        equipe.set_idade(i, idade);
     }
 
     for (int i = 0; i < num_arestas; i++) {
@@ -36,9 +35,11 @@ int main(int argc, char* argv[]) {
         sstream_linha = std::stringstream(linha);
         int x, y;
         sstream_linha >> x >> y;
-        equipe.inserir_aresta(x, y);
+        // Subtraindo 1 pois os índices no arquivo começam em 1
+        equipe.inserir_aresta(x - 1, y - 1);
     }
 
+    equipe.imprimir_idades();
     equipe.imprimir_arestas();
 
     return 0;
