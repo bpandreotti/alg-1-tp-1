@@ -54,6 +54,7 @@ bool Equipe::detectar_ciclos() {
             return true; // Ciclo encontrado!
     }
 
+    delete[] visitado;
     return false;
 }
 
