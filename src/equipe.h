@@ -10,7 +10,7 @@ private:
     std::list<int>* listas_adjacencia;
 
     bool busca_em_profundidade(int atual, int* visitado);
-    
+
 public:
     Equipe(int n);
     ~Equipe();
@@ -31,6 +31,9 @@ public:
     // Procura por ciclos no grafo usando busca em profundidade. Caso algum ciclo seja encontrado,
     // retorna `true`.
     bool detectar_ciclos();
+
+    // Executa o comando "SWAP". `a` e `b` são os índices, iniciando em 0, dos alunos A e B.
+    void comando_swap(int a, int b);
 };
 
 #endif

@@ -75,3 +75,33 @@ bool Equipe::busca_em_profundidade(int atual, int* visitado) {
 
     return false;
 }
+
+void Equipe::comando_swap(int a, int b) {
+    auto& lista_a = this->listas_adjacencia[a];
+    auto& lista_b = this->listas_adjacencia[b];
+
+    // Estou procurando e (caso encontrado) removendo o elemento da lista manualmente. Eu poderia
+    // utilizar `std::list::remove`, porém para versões do C++ anteriores ao C++20, esse método
+    // não indica se o elemento foi encontrado ou não.
+    bool encontrado = false;
+    for (auto it = lista_a.begin(); it != lista_a.end(); it++) {
+        if (*it == b) {
+            lista_a.erase(it);
+            encontrado = true;
+            break;
+        }
+    }
+
+    // Se não existia aresta de A para B, retornamos sem mudanças
+    if (!encontrado)
+        return;
+
+    // Adiciona uma aresta de B para A, no início da lista de adjacência de B
+    lista_b.push_front(a);
+
+    // Se um ciclo foi criado, devemos reverter as mudanças
+    if (this->detectar_ciclos()) {
+        lista_b.remove(a);
+        lista_a.push_back(b);
+    }
+}
