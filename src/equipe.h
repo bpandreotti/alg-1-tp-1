@@ -8,6 +8,9 @@ private:
     const int num_membros;
     int* idades;
     std::list<int>* listas_adjacencia;
+
+    bool busca_em_profundidade(int atual, int* visitado);
+    
 public:
     Equipe(int n);
     ~Equipe();
@@ -24,6 +27,10 @@ public:
     // Insere uma aresta direcionada de `a` até `b`, sem verificar a existência de ciclos, laços ou
     // arestas paralelas.
     void inserir_aresta(int a, int b);
+
+    // Procura por ciclos no grafo usando busca em profundidade. Caso algum ciclo seja encontrado,
+    // retorna `true`.
+    bool detectar_ciclos();
 };
 
 #endif
