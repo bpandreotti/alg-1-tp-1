@@ -12,6 +12,10 @@ private:
 
     bool busca_em_profundidade(int atual, int* visitado, std::stack<int>* ordenacao);
 
+    // Procura uma aresta de A para B e troca sua direção se ela existir. Retorna `true` caso a
+    // aresta tenha sido encontrada e a troca realizada.
+    bool trocar_aresta(int a, int b);
+
 public:
     Equipe(int n);
     ~Equipe();

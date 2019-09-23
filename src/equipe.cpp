@@ -77,36 +77,42 @@ bool Equipe::busca_em_profundidade(int atual, int* visitado, std::stack<int>* or
     return false;
 }
 
-void Equipe::comando_swap(int a, int b) {
+bool Equipe::trocar_aresta(int a, int b) {
     auto& lista_a = this->listas_adjacencia[a];
     auto& lista_b = this->listas_adjacencia[b];
 
-    // Estou procurando e (caso encontrado) removendo o elemento da lista manualmente. Eu poderia
-    // utilizar `std::list::remove`, porém para versões do C++ anteriores ao C++20, esse método
-    // não indica se o elemento foi encontrado ou não.
-    bool encontrado = false;
-    for (auto it = lista_a.begin(); it != lista_a.end(); it++) {
-        if (*it == b) {
-            lista_a.erase(it);
-            encontrado = true;
-            break;
+    auto tamanho_original = lista_a.size();
+    lista_a.remove(b);
+
+    // Como `std::list::remove` não retornar se a remoção pôde ser realizada ou não, checamos se o
+    // tamanho da lista mudou. Caso tenha mudado, o elemento foi removido.
+    if (lista_a.size() != tamanho_original) {
+        lista_b.push_front(a);
+        return true;
+    }
+
+    return false;
+}
+
+void Equipe::comando_swap(int a, int b) {
+    // Tenta trocar a direção de uma aresta de A para B
+    bool encontrada = this->trocar_aresta(a, b);
+    if (encontrada) {
+        // Se a troca da direção da aresta causou a formação de um ciclo, devemos revertê-la
+        if (this->detectar_ciclos()) {
+            this->trocar_aresta(b, a);
+        }
+        return;
+    }
+
+    // Se não existia uma aresta de A para B, fazemos o mesmo, procurando uma aresta de B para A
+    encontrada = this->trocar_aresta(b, a);
+    if (encontrada) {
+        if (this->detectar_ciclos()) {
+            this->trocar_aresta(a, b);
         }
     }
 
-    // Se não existia aresta de A para B, retornamos sem mudanças
-    // @TODO: caso não exista uma aresta de A para B, devemos checar também pela existência de uma
-    // aresta de B para A.
-    if (!encontrado)
-        return;
-
-    // Adiciona uma aresta de B para A, no início da lista de adjacência de B
-    lista_b.push_front(a);
-
-    // Se um ciclo foi criado, devemos reverter as mudanças
-    if (this->detectar_ciclos()) {
-        lista_b.remove(a);
-        lista_a.push_back(b);
-    }
 }
 
 void Equipe::comando_meeting() {

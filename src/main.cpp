@@ -47,10 +47,9 @@ int main(int argc, char* argv[]) {
 
     equipe.imprimir_idades();
     equipe.imprimir_arestas();
-    std::cout
-        << (equipe.detectar_ciclos() ? "Ciclo encontrado" : "Nenhum ciclo encontrado")
-        << std::endl;
+    std::cout << "SWAP" << std::endl;
+    equipe.comando_swap(0, 1);
+    equipe.imprimir_arestas();
 
-    equipe.comando_meeting();
     return 0;
 }
