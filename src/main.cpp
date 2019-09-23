@@ -51,5 +51,6 @@ int main(int argc, char* argv[]) {
         << (equipe.detectar_ciclos() ? "Ciclo encontrado" : "Nenhum ciclo encontrado")
         << std::endl;
 
+    equipe.comando_meeting();
     return 0;
 }

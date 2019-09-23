@@ -10,6 +10,7 @@ private:
     std::list<int>* listas_adjacencia;
 
     bool busca_em_profundidade(int atual, int* visitado);
+    bool ordenacao_topologica(int atual, int* visitado, std::list<int>& ordenacao);
 
 public:
     Equipe(int n);
@@ -32,8 +33,10 @@ public:
     // retorna `true`.
     bool detectar_ciclos();
 
-    // Executa o comando "SWAP". `a` e `b` são os índices, iniciando em 0, dos alunos A e B.
+    // Executa o comando "SWAP". `a` e `b` são os índices, começando em 0, dos alunos A e B.
     void comando_swap(int a, int b);
+
+    void comando_meeting();
 };
 
 #endif

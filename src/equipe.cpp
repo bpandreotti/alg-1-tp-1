@@ -106,3 +106,42 @@ void Equipe::comando_swap(int a, int b) {
         lista_a.push_back(b);
     }
 }
+
+bool Equipe::ordenacao_topologica(int atual, int* visitado, std::list<int>& ordenacao) {
+    // @TODO: Combinar esse método e `Equipe::busca_em_profundidade` em um método só. Esse metódo
+    // também procura ciclos, tornando o método `Equipe::busca_em_profundidade` desencessário.
+
+    visitado[atual] = 1; // 1 indica que o vértice atual está sendo processado
+
+    for (const int& vizinho : this->listas_adjacencia[atual]) {
+        // Se encontrarmos um vértice marcado com 1, isso significa que existe um ciclo no grafo
+        if (visitado[vizinho] == 1)
+            return true;
+        else if (visitado[vizinho] == 0)
+            this->ordenacao_topologica(vizinho, visitado, ordenacao);
+    }
+
+    visitado[atual] = 2; // 2 indica que o vértice atual já foi completamente processado
+    ordenacao.push_front(atual);
+    return false;
+}
+
+void Equipe::comando_meeting() {
+    std::list<int> ordenacao;
+
+    // Para mais detalhes sobre como esse método funciona, vide `Equipe::busca_em_profundidade`
+    int* visitado = new int[this->num_membros];
+    for (int i = 0; i < this->num_membros; i++)
+        visitado[i] = 0;
+
+    for (int i = 0; i < this->num_membros; i++) {
+        if (visitado[i] == 0)
+            this->ordenacao_topologica(i, visitado, ordenacao);
+    }
+
+    delete[] visitado;
+
+    for (auto& a : ordenacao)
+        std::cout << a << " ";
+    std::cout << std::endl;
+}
