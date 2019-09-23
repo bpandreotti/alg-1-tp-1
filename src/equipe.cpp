@@ -50,7 +50,9 @@ bool Equipe::detectar_ciclos() {
         if (visitado[i] != 0)
             continue;
 
-        if (busca_em_profundidade(i, visitado))
+        // Passamos `nullptr` para indicar ao método `Equipe::busca_em_profundidade` que não
+        // estamos interessados na ordenação topológica.
+        if (busca_em_profundidade(i, visitado, nullptr))
             return true; // Ciclo encontrado!
     }
 
@@ -58,10 +60,7 @@ bool Equipe::detectar_ciclos() {
     return false;
 }
 
-bool Equipe::busca_em_profundidade(int atual, int* visitado) {
-    // @WIP: Por ora, a busca em profundidade só está sendo usada para procurar ciclos. Futuramente
-    // esse método fará mais coisas, então o tipo de retorno pode mudar.
-
+bool Equipe::busca_em_profundidade(int atual, int* visitado, std::stack<int>* ordenacao) {
     visitado[atual] = 1; // 1 indica que o vértice atual está sendo processado
 
     for (const int& vizinho : this->listas_adjacencia[atual]) {
@@ -69,11 +68,12 @@ bool Equipe::busca_em_profundidade(int atual, int* visitado) {
         if (visitado[vizinho] == 1)
             return true;
         else if (visitado[vizinho] == 0)
-            this->busca_em_profundidade(vizinho, visitado);
+            this->busca_em_profundidade(vizinho, visitado, ordenacao);
     }
 
     visitado[atual] = 2; // 2 indica que o vértice atual já foi completamente processado
-
+    if (ordenacao != nullptr)
+        ordenacao->push(atual);
     return false;
 }
 
@@ -94,6 +94,8 @@ void Equipe::comando_swap(int a, int b) {
     }
 
     // Se não existia aresta de A para B, retornamos sem mudanças
+    // @TODO: caso não exista uma aresta de A para B, devemos checar também pela existência de uma
+    // aresta de B para A.
     if (!encontrado)
         return;
 
@@ -107,41 +109,25 @@ void Equipe::comando_swap(int a, int b) {
     }
 }
 
-bool Equipe::ordenacao_topologica(int atual, int* visitado, std::list<int>& ordenacao) {
-    // @TODO: Combinar esse método e `Equipe::busca_em_profundidade` em um método só. Esse metódo
-    // também procura ciclos, tornando o método `Equipe::busca_em_profundidade` desencessário.
-
-    visitado[atual] = 1; // 1 indica que o vértice atual está sendo processado
-
-    for (const int& vizinho : this->listas_adjacencia[atual]) {
-        // Se encontrarmos um vértice marcado com 1, isso significa que existe um ciclo no grafo
-        if (visitado[vizinho] == 1)
-            return true;
-        else if (visitado[vizinho] == 0)
-            this->ordenacao_topologica(vizinho, visitado, ordenacao);
-    }
-
-    visitado[atual] = 2; // 2 indica que o vértice atual já foi completamente processado
-    ordenacao.push_front(atual);
-    return false;
-}
-
 void Equipe::comando_meeting() {
-    std::list<int> ordenacao;
+    std::stack<int> ordenacao;
 
-    // Para mais detalhes sobre como esse método funciona, vide `Equipe::busca_em_profundidade`
+    // Para mais detalhes sobre como esse método funciona, vide `Equipe::detectar_ciclos`
     int* visitado = new int[this->num_membros];
     for (int i = 0; i < this->num_membros; i++)
         visitado[i] = 0;
 
     for (int i = 0; i < this->num_membros; i++) {
         if (visitado[i] == 0)
-            this->ordenacao_topologica(i, visitado, ordenacao);
+            this->busca_em_profundidade(i, visitado, &ordenacao);
     }
 
     delete[] visitado;
 
-    for (auto& a : ordenacao)
-        std::cout << a << " ";
+    while (ordenacao.size() > 0) {
+        std::cout << ordenacao.top() << " ";
+        ordenacao.pop();
+    }
+
     std::cout << std::endl;
 }

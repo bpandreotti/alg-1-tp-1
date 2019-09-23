@@ -2,6 +2,7 @@
 #define EQUIPE_H
 
 #include <list>
+#include <stack>
 
 class Equipe {
 private:
@@ -9,8 +10,7 @@ private:
     int* idades;
     std::list<int>* listas_adjacencia;
 
-    bool busca_em_profundidade(int atual, int* visitado);
-    bool ordenacao_topologica(int atual, int* visitado, std::list<int>& ordenacao);
+    bool busca_em_profundidade(int atual, int* visitado, std::stack<int>* ordenacao);
 
 public:
     Equipe(int n);
