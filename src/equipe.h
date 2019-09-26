@@ -15,6 +15,8 @@ private:
     // Procura uma aresta de A para B e troca sua direção se ela existir. Retorna `true` caso a
     // aresta tenha sido encontrada e a troca realizada.
     bool trocar_aresta(int a, int b);
+    std::list<int>* revertido();
+    int menor_idade(std::list<int>* revertido, int a);
 
 public:
     Equipe(int n);
@@ -41,6 +43,8 @@ public:
     void comando_swap(int a, int b);
 
     void comando_meeting();
+
+    int comando_commander(int a);
 };
 
 #endif

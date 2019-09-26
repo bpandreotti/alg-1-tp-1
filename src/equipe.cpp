@@ -137,3 +137,36 @@ void Equipe::comando_meeting() {
 
     std::cout << std::endl;
 }
+
+std::list<int>* Equipe::revertido() {
+    auto grafo_revertido = new std::list<int>[this->num_membros];
+
+    for (int i = 0; i < this->num_membros; i++) {
+        for (int j : this->listas_adjacencia[i]) {
+            grafo_revertido[j].push_back(i);
+        }
+    }
+
+    return grafo_revertido;
+}
+
+int Equipe::comando_commander(int a) {
+    auto grafo_revertido = this->revertido();
+    int menor_idade = this->menor_idade(grafo_revertido, a);
+    delete[] grafo_revertido;
+
+    if (menor_idade == this->idades[a])
+        return -1;
+    return menor_idade;
+}
+
+int Equipe::menor_idade(std::list<int>* revertido, int a) {
+    int menor = this->idades[a];
+    for (int i : revertido[a]) {
+        int r = this->menor_idade(revertido, i);
+        if (r < menor)
+            menor = r;
+    }
+
+    return menor;
+}
