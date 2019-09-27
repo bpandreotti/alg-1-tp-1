@@ -16,7 +16,7 @@ private:
     // aresta tenha sido encontrada e a troca realizada.
     bool trocar_aresta(int a, int b);
     std::list<int>* revertido();
-    int menor_idade(std::list<int>* revertido, int a);
+    int menor_idade(std::list<int>* revertido, int* visitado, int a);
 
 public:
     Equipe(int n);
@@ -40,9 +40,9 @@ public:
     bool detectar_ciclos();
 
     // Executa o comando "SWAP". `a` e `b` são os índices, começando em 0, dos alunos A e B.
-    void comando_swap(int a, int b);
+    bool comando_swap(int a, int b);
 
-    void comando_meeting();
+    std::stack<int> comando_meeting();
 
     int comando_commander(int a);
 };

@@ -67,8 +67,10 @@ bool Equipe::busca_em_profundidade(int atual, int* visitado, std::stack<int>* or
         // Se encontrarmos um vértice marcado com 1, isso significa que existe um ciclo no grafo
         if (visitado[vizinho] == 1)
             return true;
-        else if (visitado[vizinho] == 0)
-            this->busca_em_profundidade(vizinho, visitado, ordenacao);
+        else if (visitado[vizinho] == 0) {
+            if (this->busca_em_profundidade(vizinho, visitado, ordenacao))
+                return true;
+        }
     }
 
     visitado[atual] = 2; // 2 indica que o vértice atual já foi completamente processado
@@ -94,15 +96,16 @@ bool Equipe::trocar_aresta(int a, int b) {
     return false;
 }
 
-void Equipe::comando_swap(int a, int b) {
+bool Equipe::comando_swap(int a, int b) {
     // Tenta trocar a direção de uma aresta de A para B
     bool encontrada = this->trocar_aresta(a, b);
     if (encontrada) {
         // Se a troca da direção da aresta causou a formação de um ciclo, devemos revertê-la
         if (this->detectar_ciclos()) {
             this->trocar_aresta(b, a);
-        }
-        return;
+            return false;
+        } else
+            return true;
     }
 
     // Se não existia uma aresta de A para B, fazemos o mesmo, procurando uma aresta de B para A
@@ -110,12 +113,14 @@ void Equipe::comando_swap(int a, int b) {
     if (encontrada) {
         if (this->detectar_ciclos()) {
             this->trocar_aresta(a, b);
-        }
-    }
-
+            return false;
+        } else
+            return true;
+    } else
+        return false;
 }
 
-void Equipe::comando_meeting() {
+std::stack<int> Equipe::comando_meeting() {
     std::stack<int> ordenacao;
 
     // Para mais detalhes sobre como esse método funciona, vide `Equipe::detectar_ciclos`
@@ -129,13 +134,7 @@ void Equipe::comando_meeting() {
     }
 
     delete[] visitado;
-
-    while (ordenacao.size() > 0) {
-        std::cout << ordenacao.top() << " ";
-        ordenacao.pop();
-    }
-
-    std::cout << std::endl;
+    return ordenacao;
 }
 
 std::list<int>* Equipe::revertido() {
@@ -152,21 +151,38 @@ std::list<int>* Equipe::revertido() {
 
 int Equipe::comando_commander(int a) {
     auto grafo_revertido = this->revertido();
-    int menor_idade = this->menor_idade(grafo_revertido, a);
-    delete[] grafo_revertido;
 
-    if (menor_idade == this->idades[a])
-        return -1;
+    int* visitado = new int[this->num_membros];
+    for (int i = 0; i < this->num_membros; i++)
+        visitado[i] = 0;
+
+    // Como não queremos considerar a idade do vértice `a`, ao invés de chamar o método diretamente
+    // nele, o chamamos para todos os seus vizinhos, e procuramos a menor idade encontrada nessas
+    // chamadas.
+    int menor_idade = INT32_MAX;
+    for (int i : grafo_revertido[a]) {
+        int r = this->menor_idade(grafo_revertido, visitado, i);
+        if (r < menor_idade)
+            menor_idade = r;
+    }
+
+    delete[] grafo_revertido;
+    delete[] visitado;
     return menor_idade;
 }
 
-int Equipe::menor_idade(std::list<int>* revertido, int a) {
+int Equipe::menor_idade(std::list<int>* revertido, int* visitado, int a) {
+    visitado[a] = 1;
+
     int menor = this->idades[a];
     for (int i : revertido[a]) {
-        int r = this->menor_idade(revertido, i);
-        if (r < menor)
-            menor = r;
+        if (visitado[i] == 0) {
+            int r = this->menor_idade(revertido, visitado, i);
+            if (r < menor)
+                menor = r;
+        }
     }
 
+    visitado[a] = 2;
     return menor;
 }
